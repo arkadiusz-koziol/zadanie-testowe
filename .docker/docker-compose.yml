@@ -1,0 +1,50 @@
+volumes:
+    postgres-data:
+    redis-data:
+
+networks:
+    zadanie-testowe-network:
+
+name: "zadanie-testowe"
+
+services:
+    php:
+        container_name: zadanie-testowe-php
+        ports:
+            - "8061:80"
+        build:
+            context: ..
+            dockerfile: .docker/php/Dockerfile
+        volumes:
+            - ../:/var/www/app
+            - ./nginx/app.conf:/etc/nginx/conf.d/default.conf
+        networks:
+            - zadanie-testowe-network
+        depends_on:
+            - postgres
+            - redis
+
+    postgres:
+        container_name: zadanie-testowe-db
+        image: postgres:16.0
+        ports:
+            - "127.0.0.1:5470:5432"
+        volumes:
+            - postgres-data:/var/lib/postgresql/data
+        environment:
+            POSTGRES_PASSWORD: 'password'
+            POSTGRES_DB: 'zadanie-testowe-db'
+            POSTGRES_USER: 'user'
+        restart: always
+        networks:
+            - zadanie-testowe-network
+
+    redis:
+        container_name: zadanie-testowe-redis
+        image: redis:latest
+        sysctls:
+            - net.core.somaxconn=511
+        volumes:
+            - redis-data:/data
+        networks:
+            - zadanie-testowe-network
