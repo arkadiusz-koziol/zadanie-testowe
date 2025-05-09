@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Comments\CreateCommentController;
 use App\Http\Controllers\Api\Comments\DeleteCommentController;
 use App\Http\Controllers\Api\Comments\ListCommentController;
@@ -17,7 +18,11 @@ use App\Http\Controllers\Api\Users\ShowUserController;
 use App\Http\Controllers\Api\Users\UpdateUserController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('api')->group(function (): void {
+Route::middleware(['api'])->group(function (): void {
+    Route::post('/login', LoginController::class);
+});
+
+Route::middleware(['api', 'auth:sanctum'])->group(function (): void {
     Route::get('posts', ListPostsController::class);
     Route::get('posts/{id}', ShowPostController::class);
     Route::post('posts', CreatePostController::class);
